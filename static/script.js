@@ -71,7 +71,7 @@ save_value = function (el, url) {
 };
 
 var save_form = function () {
-    
+
 };
 
 var update_fields = function () {
