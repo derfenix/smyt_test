@@ -10,10 +10,10 @@ admin.autodiscover()
 
 urlpatterns = patterns(
     '',
+    url(r'^admin/', include(admin.site.urls)),
     url(r'^$', IndexView.as_view(), name='home'),
     url(r'^(?P<model>\w+)/$', MainView.as_view(), name='mainview'),
 
-    url(r'^admin/', include(admin.site.urls)),
 )
 
 
