@@ -1,0 +1,3 @@
+pyyaml
+django<1.7
+South
