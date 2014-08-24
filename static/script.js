@@ -40,11 +40,11 @@ setInput = function (el, ftype, url) {
 };
 
 save_value = function (el, url) {
-    console.log(url);
     $(el).attr('disabled', 'disabled');
 
     function stop_loading() {
         $(el).removeAttr('disabled');
+        $(el).focus();
     }
 
     var val = $(el).val();
@@ -54,12 +54,12 @@ save_value = function (el, url) {
     $.post(url,
         {id: itemid, field: name, value: val, csrfmiddlewaretoken: csrf},
         function (res) {
-            if (res == '0') {
+            if (res.status == 'OK') {
                 $(current).html(val);
                 $(el).remove();
                 $(current).show();
             } else {
-                alert(res);
+                alert(res.message);
                 stop_loading();
             }
         }

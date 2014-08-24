@@ -44,9 +44,6 @@ class MainView(ContextMixin, View):
             raise Http404(self.model_name)
         return super(MainView, self).dispatch(request, *args, **kwargs)
 
-    def get_success_url(self):
-        return self.request.get_full_path()
-
     def get_context_data(self, **kwargs):
         context = {
             'entires': list(self.model.objects.all().values()),
@@ -138,11 +135,14 @@ class MainView(ContextMixin, View):
         return 0
 
     def post(self, request, *args, **kwargs):
-        """:type: django.forms.models.ModelForm"""
         if request.POST.get('new', False):
             pass
         else:
             res = self.update_value(request.POST)
+            if res:
+                res = {'status': 'error', 'message': res}
+            else:
+                res = {'status': 'OK'}
             return self.render_to_response(res)
 
     def get(self, request, *args, **kwargs):
