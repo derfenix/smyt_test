@@ -8,6 +8,11 @@ var current;
  */
 //noinspection JSUnusedGlobalSymbols
 function setInput(el, ftype, url) {
+    if (current) {
+        // Already exists input field, should be saved before create new input
+        return;
+    }
+
     current = el;
 
     // Select field's type
@@ -80,6 +85,7 @@ function save_value(el, url) {
                 $(current).html(val);
                 $(el).remove();  // Remove input from DOM
                 $(current).show(); // Show text value
+                current = null;
             } else {
                 // On failure - show error message and restore input state
                 alert(res.message);
