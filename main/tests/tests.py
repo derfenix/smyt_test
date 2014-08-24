@@ -1,4 +1,6 @@
 import datetime
+import json
+
 from django.db.models.loading import get_model
 from django.test import TestCase
 from django.test.client import Client
@@ -72,12 +74,12 @@ class Test(TestCase):
         data = {'new': True, "name": "test", "paycheck": 100, "date_joined": "20120222"}
         res = client.post('/users/', data=data, follow=True)
         self.assertEqual(res.status_code, 200)
-        self.assertContains(res, 'Enter a valid date.')
+        self.assertContains(res, 'Value is in wrong format')
 
         data = {'new': True, "department": "test", "spots": 'aaa', "owner": "Budda"}
         res = client.post('/rooms/', data=data)
         self.assertEqual(res.status_code, 200)
-        self.assertContains(res, 'Enter a whole number')
+        self.assertContains(res, 'Value is in wrong format')
 
     def test_update_items_users(self):
         client = Client()
@@ -88,26 +90,30 @@ class Test(TestCase):
 
         data = {'id': 1, 'field': 'name', 'value': "test2"}
         res = client.post('/users/', data)
-        self.assertEqual(res.content, '0')
+        self.assertEqual(json.loads(res.content), {'status': 'OK'})
         self.assertEqual(users.objects.first().name, 'test2')
 
         data = {'id': 1, 'field': 'paycheck', 'value': "500"}
         res = client.post('/users/', data)
-        self.assertEqual(res.content, '0')
+        self.assertEqual(json.loads(res.content), {'status': 'OK'})
         self.assertEqual(users.objects.first().paycheck, 500)
 
         data = {'id': 1, 'field': 'paycheck', 'value': "bbb"}
         res = client.post('/users/', data)
-        self.assertEqual(res.content, 'Value is in wrong format')
+        self.assertEqual(
+            json.loads(res.content)['message'], 'Value is in wrong format'
+        )
 
         data = {'id': 1, 'field': 'date_joined', 'value': "10-05-2012"}
         res = client.post('/users/', data)
-        self.assertEqual(res.content, '0')
+        self.assertEqual(json.loads(res.content), {'status': 'OK'})
         self.assertEqual(users.objects.first().date_joined, datetime.date(2012, 5, 10))
 
         data = {'id': 1, 'field': 'date_joined', 'value': "10052012"}
         res = client.post('/users/', data)
-        self.assertEqual(res.content, 'Value is in wrong format')
+        self.assertEqual(
+            json.loads(res.content)['message'], 'Value is in wrong format'
+        )
 
     def test_update_items_rooms(self):
         client = Client()
@@ -118,19 +124,21 @@ class Test(TestCase):
 
         data = {'id': 1, 'field': 'department', 'value': "test2"}
         res = client.post('/rooms/', data)
-        self.assertEqual(res.content, '0')
+        self.assertDictEqual(json.loads(res.content), {'status': 'OK'})
         self.assertEqual(rooms.objects.first().department, 'test2')
 
         data = {'id': 1, 'field': 'spots', 'value': "500"}
         res = client.post('/rooms/', data)
-        self.assertEqual(res.content, '0')
+        self.assertEqual(json.loads(res.content), {'status': 'OK'})
         self.assertEqual(rooms.objects.first().spots, 500)
 
         data = {'id': 1, 'field': 'spots', 'value': "bbb"}
         res = client.post('/rooms/', data)
-        self.assertEqual(res.content, 'Value is in wrong format')
+        self.assertEqual(
+            json.loads(res.content)['message'], 'Value is in wrong format'
+        )
 
         data = {'id': 1, 'field': 'owner', 'value': "Boom"}
         res = client.post('/rooms/', data)
-        self.assertEqual(res.content, '0')
+        self.assertEqual(json.loads(res.content), {'status': 'OK'})
         self.assertEqual(rooms.objects.first().owner, "Boom")
