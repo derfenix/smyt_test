@@ -4,12 +4,10 @@ from collections import OrderedDict
 import json
 
 from django.db.models.loading import get_model
-
 from django.http.response import Http404, HttpResponse
 from django.views.generic.base import TemplateView, ContextMixin, View
 
 from main.utils import DateTimeEncoder
-
 from .models import MODELS_DATA
 
 
@@ -31,7 +29,8 @@ class MainView(ContextMixin, View):
     _fields_types = {}
     object = None
 
-    def render_to_response(self, context, **response_kwargs):
+    @staticmethod
+    def render_to_response(context, **response_kwargs):
         return HttpResponse(
             json.dumps(context, ensure_ascii=False, cls=DateTimeEncoder, indent=4),
             content_type="application/json"
@@ -78,11 +77,12 @@ class MainView(ContextMixin, View):
         :type field: str
         :param value: value for test
         :type value: str or unicode
-        :return: True if value in valid format
-        :rtype: bool
+        :return: value
+        :rtype: int or unicode or datetime.datetime
         """
         field_type = self.fields_types(self.model_name)[field]
         val = False
+
         try:
             if field_type == 'int':
                 val = int(value)
@@ -92,8 +92,9 @@ class MainView(ContextMixin, View):
                 import datetime
 
                 val = datetime.datetime.strptime(value, '%d-%m-%Y')
-        except ValueError:
-            return False
+        except (ValueError, TypeError):
+            return None
+
         return val
 
     def update_value(self, data):
@@ -101,7 +102,7 @@ class MainView(ContextMixin, View):
 
         :param data: post data
         :type data: dict
-        :return: error message or 0
+        :return: error message if any
         :rtype: unicode
         """
         item_id = int(data.get('id', 0))
@@ -130,13 +131,58 @@ class MainView(ContextMixin, View):
             setattr(item, field, value)
         except AttributeError:
             return "Wrong field name"
-        item.save()
+        except ValueError:
+            return "Wrong value"
+        else:
+            item.save(update_fields=(field,))
 
-        return 0
+        return None
+
+    def save_form(self, data):
+        """Save form data
+
+        :param data: POST data
+        :type data: dict
+        :return: dict with errors and values
+        :rtype: dict[dict]
+        """
+        item = self.model()
+        """:type: django.db.models.Model"""
+        errors = {}
+
+        for name, ftype in self.fields_types(self.model_name).items():
+            value = data.get(name, None)
+            """:type: str or unicode"""
+            new_value = self.test_value(name, value)
+
+            if not value:
+                errors[name] = 'Value is required'
+            elif not new_value:
+                errors[name] = 'Value is in wrong format'
+            else:
+                if not errors:
+                    # If errors already exists - no need to set
+                    setattr(item, name, new_value)
+
+        if not errors:
+            item.save(force_insert=True)
+        else:
+            return {
+                'errors': errors,
+                'values': data
+            }
 
     def post(self, request, *args, **kwargs):
         if request.POST.get('new', False):
-            pass
+            res = self.save_form(request.POST)
+            context = self.get_context_data()
+
+            if res:  # Errors exists
+                # Append errors and values lists to context
+                context.update(res)
+            # If no errorrs - just return standart context - entries list and form fields
+
+            return self.render_to_response(context)
         else:
             res = self.update_value(request.POST)
             if res:

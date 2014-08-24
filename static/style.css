@@ -44,3 +44,10 @@ ul {
 #form input[type='text'], #form input[type='number'] {
     width: 300px;
 }
+
+.error {
+    color: red;
+    font-size: 80%;
+    margin-top: -3px;
+    display: block;
+}

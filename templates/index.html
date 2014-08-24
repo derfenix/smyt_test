@@ -43,7 +43,7 @@
     <script id="form_template" type="text/x-jsmart-tmpl">
         {% verbatim %}
             <div id="form">
-                <form action="./" method="post">
+                <form action="/{$model_name}/" method="post">
                     <fieldset>
                         <legend>
                             Новая запись
@@ -53,7 +53,11 @@
                         <ul>
                             {foreach $models[$model_name].fields as $f}
                                 <label>{$f.title}</label>
-                                <input type="text" data-type="{$f.type}" name="{$f.id}"/>
+                                <input type="text" data-type="{$f.type}" name="{$f.id}"
+                                value="{$values[$f.id]}"/>
+                                {if $errors[$f.id]}
+                                    <span class="error">{$errors[$f.id]}</span>
+                                {/if}
                             {/foreach}
                         </ul>
                     </fieldset>

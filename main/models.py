@@ -20,7 +20,6 @@ class Builder(object):
 
     def __init__(self, filepath=None):
         """
-
         :param filepath: path to models' specifications file
         :type filepath: str or unicode
         """
