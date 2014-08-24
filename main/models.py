@@ -17,21 +17,16 @@ class Builder(object):
     """
     Models builder class
     """
-    filepath = None
 
     def __init__(self, filepath=None):
         """
 
         :param filepath: path to models' specifications file
         :type filepath: str or unicode
-        :raise Exception: if no filepath specified and no class's filepath
         """
         self.models = {}
         self.models_data = None
-        if filepath:
-            self.filepath = filepath
-        if not self.filepath:
-            raise Exception('No file specified')
+        self.filepath = filepath
 
     @staticmethod
     def __build_meta(title):
@@ -86,6 +81,7 @@ class Builder(object):
         register admin interfaces for this models
         """
         self.__load()
+
         for name, data in self.models_data.items():
             attrs = {
                 params['id']: self.__get_field(params.get('type', 'char'), params)
