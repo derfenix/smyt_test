@@ -36,7 +36,7 @@ ul {
     display: block;
 }
 
-#form>form>fieldset>input {
+#form > form > fieldset > input {
     float: right;
     margin-top: 60px;
 }

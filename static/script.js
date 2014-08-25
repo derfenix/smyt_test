@@ -35,7 +35,7 @@ function setInput(el, ftype, url) {
     $(el).hide();
     $(el).after(input);
 
-    // Attach datepicker to the fields with data-id="date"
+    // Attach datepicker to the date field
     if (ftype == 'date') {
         // Remove onblur event
         input.removeAttr('onblur');
