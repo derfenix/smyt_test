@@ -19,8 +19,6 @@ function setInput(el, ftype, url) {
     var field_type = 'text';
     if (ftype == 'int') {
         field_type = 'number';
-    } else if (ftype == 'date') {
-        field_type = 'text';
     }
 
     var name = $(el).attr('data-name');

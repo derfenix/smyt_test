@@ -7,11 +7,11 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
 <script src="{% static 'smart-2.10.min.js' %}"></script>
-<script src="{% static 'script.js' %}"></script>
 <script>
     var csrf = "{{ csrf_token }}";
     var models = {{ models|safe }};
 </script>
+<script src="{% static 'script.js' %}"></script>
 <body>
 
 <div id="menu">
