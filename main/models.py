@@ -89,6 +89,7 @@ class Builder(object):
 
             attrs['__module__'] = 'main.models'
             attrs['Meta'] = self.__build_meta(data.get('title', None))
+            attrs['__unicode__'] = lambda s: "{0} #{1}".format(name, s.id)
 
             model = type(name, (models.Model,), attrs)
             self.models[name.title()] = model
