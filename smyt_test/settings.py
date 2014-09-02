@@ -65,6 +65,8 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
 
+STATIC_ROOT = os.path.join(BASE_DIR, "static_root")
+
 MODELS_DEFENITION_FILE_PATH = os.path.join(BASE_DIR, 'models.yaml')
 
 TEST_RUNNER = 'main.tests.TestRunner'
