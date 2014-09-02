@@ -5,6 +5,7 @@ import json
 
 from django.db.models.loading import get_model
 from django.http.response import Http404, HttpResponse
+from django.utils.html import escape
 from django.views.generic.base import TemplateView, ContextMixin, View
 
 from main.utils import DateTimeEncoder
@@ -128,7 +129,7 @@ class MainView(ContextMixin, View):
         """:type: django.db.models.Model"""
 
         try:
-            setattr(item, field, value)
+            setattr(item, field, escape(value))
         except AttributeError:
             return "Wrong field name"
         except ValueError:
@@ -162,7 +163,10 @@ class MainView(ContextMixin, View):
             else:
                 if not errors:
                     # If errors already exists - no need to set
-                    setattr(item, name, new_value)
+                    if ftype != 'date':
+                        setattr(item, name, escape(new_value))
+                    else:
+                        setattr(item, name, new_value)
 
         if not errors:
             item.save(force_insert=True)
